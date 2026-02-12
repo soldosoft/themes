@@ -36,19 +36,21 @@ class SetTheme
         /**
          * Important for Laravel Octane!
          *
-         * Check if item already exists before adding it
-         * to the menu items.
+         * Only add menu items when a user is authenticated.
+         * getUserMenuItems() triggers getUserName() which requires a non-null user in Filament v4.
          */
-        if (! isset($panel->getUserMenuItems()[__('themes::themes.themes')])) {
-            $panel->userMenuItems(
-                ThemesPlugin::canView() ?
-                    [
-                        __('themes::themes.themes') => MenuItem::make('Themes')
-                            ->label(fn () => __('themes::themes.themes'))
-                            ->icon(config('themes.icon'))
-                            ->url(ThemesPage::getUrl()),
-                    ] : []
-            );
+        if (Filament::auth()->check()) {
+            if (! isset($panel->getUserMenuItems()[__('themes::themes.themes')])) {
+                $panel->userMenuItems(
+                    ThemesPlugin::canView() ?
+                        [
+                            __('themes::themes.themes') => MenuItem::make('Themes')
+                                ->label(fn () => __('themes::themes.themes'))
+                                ->icon(config('themes.icon'))
+                                ->url(ThemesPage::getUrl()),
+                        ] : []
+                );
+            }
         }
 
         FilamentColor::register($themes->getCurrentThemeColor());
